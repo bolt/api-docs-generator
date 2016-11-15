@@ -124,7 +124,7 @@ class Config
     /**
      * @return array
      */
-    public function getBuildPath()
+    public function getBuildPath($build)
     {
         $path = $this->root . '/var/build';
         $realPath = realpath($this->root . '/var/build');
@@ -132,13 +132,13 @@ class Config
             throw new \RuntimeException(sprintf('Configured build path %s does not exist.', $path));
         }
 
-        return $path . '/%version%';
+        return "$path/$build/%version%";
     }
 
     /**
      * @return array
      */
-    public function getCachePath()
+    public function getCachePath($build)
     {
         $path = $this->root . '/var/cache';
         $realPath = realpath($this->root . '/var/cache');
@@ -146,7 +146,7 @@ class Config
             throw new \RuntimeException(sprintf('Configured cache path %s does not exist.', $path));
         }
 
-        return $path . '/%version%';
+        return "$path/$build/%version%";
     }
 
     /**

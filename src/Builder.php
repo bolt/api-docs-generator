@@ -110,8 +110,8 @@ class Builder
             'theme'                => $this->config->getTheme(),
             'versions'             => $this->versions,
             'title'                => $this->config->getBuildTitle($build),
-            'build_dir'            => $this->config->getBuildPath(),
-            'cache_dir'            => $this->config->getCachePath(),
+            'build_dir'            => $this->config->getBuildPath($build),
+            'cache_dir'            => $this->config->getCachePath($build),
             'remote_repository'    => $this->remoteRepository,
             'default_opened_level' => $this->config->getDefaultOpenedLevel(),
         ];
