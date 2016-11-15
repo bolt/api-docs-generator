@@ -1,0 +1,22 @@
+#!/usr/bin/php
+<?php
+
+/**
+ * API Generator run-time.
+ *
+ * @author Gawain Lynch <gawain.lynch@gmail.com>
+ */
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Bolt\Api\Builder;
+use Bolt\Api\Console\Application;
+use Bolt\Api\Console\Command\Parse;
+use Bolt\Api\Console\Command\Render;
+
+$application = new Application();
+$application->add(new Parse());
+$application->add(new Render());
+
+$builder = new Builder();
+$builder->build($application);
