@@ -1,0 +1,27 @@
+{% extends "default/layout/layout.twig" %}
+
+{% block control_panel %}
+    <div id="control-panel">
+        {% if project.versions|length > 1 %}
+            <form action="#" method="GET">
+                <select id="version-switcher" name="version">
+                    {% for version in project.versions %}
+                        {% spaceless %}
+                        <option value="{{ path('../' ~ version ~ '/index.html')|replace({ 'release/': '' }) }}"{{ version == project.version ? ' selected' : '' }}>
+                            {{ version.longname }}
+                        </option>
+                        {% endspaceless %}
+                    {% endfor %}
+                </select>
+            </form>
+        {% endif %}
+        <form id="search-form" action="{{ path('search.html') }}" method="GET">
+            <span class="glyphicon glyphicon-search"></span>
+            <input name="search"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search">
+        </form>
+    </div>
+{% endblock %}
+
