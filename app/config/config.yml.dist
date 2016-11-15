@@ -1,0 +1,11 @@
+theme: bolt
+
+paths:
+    repository: '%root%/../repository'
+
+branches:
+    'master': 'master branch'
+
+builds:
+    public: 'Bolt Public API'
+    internal: 'Internal Bolt API'
