@@ -1,16 +1,22 @@
 {% extends "default/layout/layout.twig" %}
 
+{# Override for control_panel block #}
 {% block control_panel %}
     <div id="control-panel">
         {% if project.versions|length > 1 %}
             <form action="#" method="GET">
                 <select id="version-switcher" name="version">
-                    {% for version in project.versions %}
-                        {% spaceless %}
-                        <option value="{{ path('../' ~ version ~ '/index.html')|replace({ 'release/': '' }) }}"{{ version == project.version ? ' selected' : '' }}>
-                            {{ version.longname }}
-                        </option>
-                        {% endspaceless %}
+                    {% for version in project.versions %}{% spaceless %}
+                        {% if project.version == 'master' %}
+                            {% set pathVer = version %}
+                        {% else %}
+                            {% set pathVer = version|replace({ 'release/': '', 'master': '../master' }) %}
+                        {% endif %}
+
+                        {% set value = path('../' ~ pathVer ~ '/index.html') %}
+                        {% set selected = version == project.version ? ' selected' : '' %}
+{% endspaceless %}
+                        <option value="{{ value }}"{{ selected }}>{{ version.longname }}</option>
                     {% endfor %}
                 </select>
             </form>
@@ -24,4 +30,3 @@
         </form>
     </div>
 {% endblock %}
-
