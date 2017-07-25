@@ -49,7 +49,7 @@ class Builder
      */
     public function build(Application $application)
     {
-        /** @var Parse $command */
+        /** @var Parse $parse */
         $parse = $application->get('parse');
         /** @var Render $render */
         $render = $application->get('render');
@@ -65,7 +65,6 @@ class Builder
             $project->render([$render, 'messageCallback'], true);
             $render->echoOutput();
         }
-
     }
 
     /**
@@ -94,7 +93,7 @@ class Builder
             ->files()
             ->name('*.php')
             ->in($this->config->getPath('repository') . '/src')
-            ;
+        ;
     }
 
     /**

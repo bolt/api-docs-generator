@@ -23,7 +23,7 @@ class Parse extends ParseCommand
         parent::__construct();
         $this->output = new BufferedOutput();
         $this->input = new ArrayInput([], new InputDefinition([
-            new InputOption('verbose', true)
+            new InputOption('verbose', true),
         ]));
     }
 

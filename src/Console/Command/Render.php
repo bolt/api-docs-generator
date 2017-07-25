@@ -23,7 +23,7 @@ class Render extends RenderCommand
         parent::__construct();
         $this->output = new BufferedOutput();
         $this->input = new ArrayInput([], new InputDefinition([
-            new InputOption('verbose', true)
+            new InputOption('verbose', true),
         ]));
     }
 
