@@ -2,103 +2,54 @@
 
 namespace Bolt\Api;
 
+use Bolt\Collection\Bag;
+
 /**
  * Configuration class.
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class Config
+final class Config
 {
-    /** @var string */
-    protected $theme;
-    /** @var integer */
-    protected $defaultOpenedLevel;
-    /** @var string[] */
-    protected $paths;
-    /** @var string[] */
-    protected $branches;
-    /** @var string[] */
-    protected $builds;
-
-    /** @var string */
-    private $root;
-
-    public function __construct(array $parameters = [])
-    {
-        $parameters += $this->getDefaults();
-
-        $this->root = dirname(__DIR__);
-        $this->theme = $parameters['theme'];
-        $this->defaultOpenedLevel = $parameters['default_opened_level'];
-
-        foreach ($parameters['paths'] as $name => $title) {
-            $this->paths[$name] = $title;
-        }
-        foreach ($parameters['branches'] as $name => $title) {
-            $this->branches[$name] = $title;
-        }
-        foreach ($parameters['builds'] as $name => $title) {
-            $this->builds[$name] = $title;
-        }
-    }
+    /** @var Bag */
+    private $parameters;
 
     /**
-     * @return string
-     */
-    public function getTheme()
-    {
-        return $this->theme;
-    }
-
-    /**
-     * @param string $theme
+     * Constructor.
      *
-     * @return Config
+     * @param string $rootDir
+     * @param Bag    $parameters
      */
-    public function setTheme($theme)
+    public function __construct($rootDir, Bag $parameters)
     {
-        $this->theme = $theme;
-
-        return $this;
+        $this->parameters = $parameters->defaults($this->getDefaults());
+        $this->buildPaths($rootDir);
     }
 
     /**
+     * Return the default depth to open trees.
+     *
      * @return int
      */
     public function getDefaultOpenedLevel()
     {
-        return $this->defaultOpenedLevel;
+        return (int) $this->parameters->get('default_opened_level');
     }
 
     /**
-     * @param int $defaultOpenedLevel
+     * Return a specific path.
      *
-     * @return Config
-     */
-    public function setDefaultOpenedLevel($defaultOpenedLevel)
-    {
-        $this->defaultOpenedLevel = $defaultOpenedLevel;
-
-        return $this;
-    }
-
-    /**
      * @param string $path
      *
      * @return string
      */
     public function getPath($path)
     {
-        if (!isset($this->paths[$path])) {
-            throw new \RuntimeException(sprintf('Path %s key not set.', $path));
+        if ($this->parameters->hasPath("paths/$path")) {
+            return $this->parameters->getPath("paths/$path");
         }
 
-        $realPath = realpath(str_replace('%root%', $this->root, $this->paths[$path]));
-        if ($realPath === false || !file_exists($realPath)) {
-            throw new \RuntimeException(sprintf('Configured path %s does not exist.', $path));
-        }
-
-        return $realPath;
+        throw new \RuntimeException(sprintf('Path "%s" key not set.', $path));
     }
 
     /**
@@ -106,127 +57,59 @@ class Config
      */
     public function getPaths()
     {
-        return $this->paths;
+        return $this->parameters->get('paths');
     }
 
     /**
-     * @param string[] $paths
+     * Return the build directory for a project's build (internal or public).
      *
-     * @return Config
-     */
-    public function setPaths($paths)
-    {
-        $this->paths = $paths;
-
-        return $this;
-    }
-
-    /**
+     * @param string $projectName
+     * @param string $type
+     *
      * @return string
      */
-    public function getBuildPath($build)
+    public function getBuildPath($projectName, $type)
     {
-        $path = $this->root . '/var/build';
-        $realPath = realpath($this->root . '/var/build');
-        if ($realPath === false || !file_exists($realPath)) {
-            throw new \RuntimeException(sprintf('Configured build path %s does not exist.', $path));
-        }
+        $path = $this->getPath('build');
 
-        return "$path/$build/%version%";
+        return "$path/$projectName/$type/%version%";
     }
 
     /**
+     * Return the cache directory for a project's build (internal or public).
+     *
+     * @param string $projectName
+     * @param string $type
+     *
      * @return string
      */
-    public function getCachePath($build)
+    public function getCachePath($projectName, $type)
     {
-        $path = $this->root . '/var/cache';
-        $realPath = realpath($this->root . '/var/cache');
-        if ($realPath === false || !file_exists($realPath)) {
-            throw new \RuntimeException(sprintf('Configured cache path %s does not exist.', $path));
-        }
+        $path = $this->getPath('cache');
 
-        return "$path/$build/%version%";
+        return "$path/$projectName/$type/%version%";
     }
 
     /**
+     * Return the theme directory.
+     *
      * @return array
      */
     public function getThemePath()
     {
-        $path = $this->root . '/themes';
-        $realPath = realpath($this->root . '/themes');
-        if ($realPath === false || !file_exists($realPath)) {
-            throw new \RuntimeException(sprintf('Configured theme path %s does not exist.', $path));
-        }
+        $path = $this->getPath('theme');
 
         return [$path];
     }
 
     /**
-     * @param string $branch
+     * Return the name of the in-use theme matching the manifest.yml setting.
      *
-     * @return string[]
+     * @return string
      */
-    public function getBranch($branch)
+    public function getTheme()
     {
-        if (!isset($this->branches[$branch])) {
-            throw new \RuntimeException(sprintf('Branch %s key not set.', $branch));
-        }
-
-        return $this->branches[$branch];
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getBranches()
-    {
-        return $this->branches;
-    }
-
-    /**
-     * @param string[] $branches
-     *
-     * @return Config
-     */
-    public function setBranches($branches)
-    {
-        $this->branches = $branches;
-
-        return $this;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getBuildTitle($build)
-    {
-        if (!isset($this->builds[$build])) {
-            throw new \RuntimeException(sprintf('Build %s key not set.', $build));
-        }
-
-        return $this->builds[$build];
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getBuilds()
-    {
-        return $this->builds;
-    }
-
-    /**
-     * @param string[] $builds
-     *
-     * @return Config
-     */
-    public function setBuilds($builds)
-    {
-        $this->builds = $builds;
-
-        return $this;
+        return $this->parameters->get('theme');
     }
 
     /**
@@ -235,19 +118,25 @@ class Config
     private function getDefaults()
     {
         return [
-            'theme' => 'bolt',
-            'paths' => [
-                'repository' => '%root%/../repository',
+            'default_opened_level' => 2,
+            'paths'                => [
                 'build'      => '%root%/build',
                 'cache'      => '%root%/cache',
             ],
-            'branches' => [
-            ],
-            'builds' => [
-                'public'   => 'Bolt Public API',
-                'internal' => 'Bolt Internal API',
-            ],
-            'default_opened_level' => 2,
+            'theme' => 'bolt',
         ];
+    }
+
+    /**
+     * @param string $rootDir
+     */
+    private function buildPaths($rootDir)
+    {
+        $paths = $this->parameters->get('paths');
+        foreach ($paths as $name => $path) {
+            $paths[$name] = str_replace('%root%', $rootDir, $path);
+        }
+
+        $this->parameters = $this->parameters->replace(['paths' => $paths]);
     }
 }
