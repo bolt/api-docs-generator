@@ -1,0 +1,12 @@
+# The %root% value will be replaced with the project root path
+
+project_org/project_name:
+    path: '%root%/../repository'
+    includes:
+        - src
+    branches:
+        '1.0': '1.0 branch'
+        'master': '2.x development branch'
+    builds:
+        public: 'Public API'
+        internal: 'Internal API'

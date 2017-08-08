@@ -1,11 +1,10 @@
-theme: bolt
+# The %root% value will be replaced with the project root path
+
+default_opened_level: 2
 
 paths:
-    repository: '%root%/../repository'
+    build: %root%/var/build
+    cache: %root%/var/cache
+    theme: %root%/themes
 
-branches:
-    'master': 'master branch'
-
-builds:
-    public: 'Bolt Public API'
-    internal: 'Internal Bolt API'
+theme: bolt
