@@ -4,20 +4,15 @@ API Documentation Generator for Bolt
 Set up
 ------
 
-Set up dendendencies:
+Set up dependencies:
 
 ```
 composer install
 ```
 
-Copy `app/config/config.yml.dist` to `app/config/config.yml` and edit as needed.
+1. Copy `app/config/config.yml.dist` to `app/config/config.yml` and edit as needed.
+2. Copy `app/config/projects.yml.dist` to `app/config/projects.yml` and edit as needed.
 
-Set the target repository path:
-
-```
-paths:
-    repository: '/path/to/bolt/repo'
-```
 
 Templates
 ---------
