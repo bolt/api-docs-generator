@@ -122,7 +122,7 @@ class Config
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getBuildPath($build)
     {
@@ -136,7 +136,7 @@ class Config
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getCachePath($build)
     {
