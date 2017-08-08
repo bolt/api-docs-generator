@@ -4,65 +4,95 @@ namespace Bolt\Api;
 
 use Bolt\Api\Console\Command\Parse;
 use Bolt\Api\Console\Command\Render;
-use Sami\Project;
+use Bolt\Collection\Bag;
+use Bolt\Filesystem\Adapter\Local;
+use Bolt\Filesystem\Filesystem;
+use Bolt\Filesystem\FilesystemInterface;
+use Bolt\Filesystem\Handler\YamlFile;
+use Sami\Project as SamiProject;
 use Sami\RemoteRepository\GitHubRemoteRepository;
 use Sami\Sami;
 use Sami\Version\GitVersionCollection;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * API Generator Builder.
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class Builder
+final class Builder
 {
+    /** @var FilesystemInterface */
+    private $filesystem;
+    /** @var string */
+    private $root;
+
     /** @var Config */
-    protected $config;
-    /** @var GitVersionCollection */
-    protected $versions;
-    /** @var GitHubRemoteRepository */
-    protected $remoteRepository;
+    private $config;
+    /** @var Project[] */
+    private $projects;
 
     /**
      * Constructor.
      *
-     * @param array $config
+     * @param array|null $config
      */
     public function __construct(array $config = null)
     {
-        $this->loadConfig($config);
+        $this->root = dirname(__DIR__);
+        $this->filesystem = new Filesystem(new Local($this->root));
 
-        $this->versions = GitVersionCollection::create($this->config->getPath('repository'));
-        foreach ($this->config->getBranches() as $branchName => $branchTitle) {
-            $this->versions->add($branchName, $branchTitle);
-        }
-        $this->remoteRepository = new GitHubRemoteRepository('bolt/bolt', $this->config->getPath('repository'));
+        $this->loadConfig($config);
     }
 
     /**
      * Build configured Sami API documentation.
      *
      * @param Application $application
+     * @param array|null  $config
+     * @param array|null  $projects
      */
-    public function build(Application $application)
+    public function build(Application $application, array $projects = null)
     {
+        $this->loadProjects($projects);
+
+        foreach ($this->projects as $projectName => $project) {
+            $this->buildProject($application, $project);
+        }
+    }
+
+    /**
+     * @param Application $application
+     * @param Project     $project
+     */
+    public function buildProject(Application $application, Project $project)
+    {
+        /** @var GitVersionCollection $versions */
+        $versions = GitVersionCollection::create($project->getPath());
+        foreach ($project->getBranches() as $branchName => $branchTitle) {
+            $versions->add($branchName, $branchTitle);
+        }
+        $remoteRepository = new GitHubRemoteRepository($project->getName(), $project->getPath());
+
         /** @var Parse $parse */
         $parse = $application->get('parse');
         /** @var Render $render */
         $render = $application->get('render');
 
-        foreach ($this->config->getBuilds() as $buildName => $buildTitle) {
-            $container = $this->createContainer($buildName);
+        foreach ($project->getBuilds() as $buildName => $buildTitle) {
+            $buildConfig = $this->getBuildConfig($project, $versions, $remoteRepository, $buildName);
+            $container = $this->createContainer($project, $buildConfig);
 
-            /** @var Project $publicProject */
-            $project = $container['project'];
+            /** @var SamiProject $samiProject */
+            $samiProject = $container['project'];
 
-            $project->parse([$parse, 'messageCallback'], false);
+            echo "Parsing $buildName $buildTitle\n";
+            $samiProject->parse([$parse, 'messageCallback'], false);
             $parse->echoOutput();
-            $project->render([$render, 'messageCallback'], true);
+
+            echo "Rendering $buildName $buildTitle\n";
+            $samiProject->render([$render, 'messageCallback'], true);
             $render->echoOutput();
         }
     }
@@ -70,63 +100,99 @@ class Builder
     /**
      * Build a Sami application container.
      *
-     * @param string $build
+     * @param Project $project
+     * @param array   $buildConfig
      *
      * @return Sami
      */
-    protected function createContainer($build)
+    private function createContainer(Project $project, array $buildConfig)
     {
-        $container = new Sami($this->getIterator(), $this->getBuildConfig($build));
+        $container = new Sami($this->getIterator($project), $buildConfig);
         $container['template_dirs'] = $this->config->getThemePath();
 
         return $container;
     }
 
     /**
-     * Get an iterator for the repository directory.
+     * Get an iterator for the repository source code directories.
      *
      * @return Finder|\Symfony\Component\Finder\SplFileInfo[]
      */
-    protected function getIterator()
+    private function getIterator(Project $project)
     {
         return Finder::create()
             ->files()
             ->name('*.php')
-            ->in($this->config->getPath('repository') . '/src')
+            ->in($project->getIncludes())
         ;
     }
 
     /**
-     * GReturn the default configuration.
+     * Return the build configuration for a project.
      *
-     * @param string $build
+     * @param Project                $project
+     * @param GitVersionCollection   $versions
+     * @param GitHubRemoteRepository $remoteRepository
+     * @param string                 $build
      *
      * @return array
      */
-    protected function getBuildConfig($build)
+    private function getBuildConfig(Project $project, GitVersionCollection $versions, GitHubRemoteRepository $remoteRepository, $build)
     {
         return [
             'theme'                => $this->config->getTheme(),
-            'versions'             => $this->versions,
-            'title'                => $this->config->getBuildTitle($build),
-            'build_dir'            => $this->config->getBuildPath($build),
-            'cache_dir'            => $this->config->getCachePath($build),
-            'remote_repository'    => $this->remoteRepository,
+            'versions'             => $versions,
+            'title'                => $project->getBuildTitle($build),
+            'build_dir'            => $this->config->getBuildPath($project->getName(), $build),
+            'cache_dir'            => $this->config->getCachePath($project->getName(), $build),
+            'remote_repository'    => $remoteRepository,
             'default_opened_level' => $this->config->getDefaultOpenedLevel(),
         ];
     }
 
     /**
-     * Load the configuration from YAML file.
+     * Load the configuration from the YAML file.
      *
      * @param array|null $parameters
      */
-    protected function loadConfig($parameters)
+    private function loadConfig($parameters)
     {
         if ($parameters === null) {
-            $parameters = Yaml::parse(file_get_contents(realpath(__DIR__ . '/../app/config/config.yml')));
+            /** @var YamlFile $configFile */
+            $configFile = $this->filesystem->getFile('app/config/config.yml');
+            if (!$configFile->exists()) {
+                throw new \RuntimeException('The config directory is missing a config.yml file.');
+            }
+            $parameters = (array) $configFile->parse();
         }
 
-        $this->config = new Config($parameters);
+        $this->config = new Config($this->root, Bag::from($parameters));
+    }
+
+    /**
+     * Load the projects from the YAML file.
+     *
+     * @param array|null $parameters
+     */
+    private function loadProjects($parameters)
+    {
+        if ($parameters === null) {
+            /** @var YamlFile $projectsFile */
+            $projectsFile = $this->filesystem->getFile('app/config/projects.yml');
+            if (!$projectsFile->exists()) {
+                throw new \RuntimeException('The config directory is missing a projects.yml file.');
+            }
+            $parameters = (array) $projectsFile->parse();
+        }
+        $parameters = Bag::fromRecursive($parameters);
+
+        foreach ($parameters as $projectName => $config) {
+            /** @var Bag $config */
+            if (!$config->has('path')) {
+                throw new \RuntimeException(sprintf('Project "%s" has no path set.', $projectName));
+            }
+
+            $this->projects[$projectName] = new Project($projectName, $this->root, $config);
+        }
     }
 }
