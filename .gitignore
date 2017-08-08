@@ -1,4 +1,4 @@
-config.yml
+/app/config/*.yml
 /var/build/*
 /var/cache/*
 /vendor/
