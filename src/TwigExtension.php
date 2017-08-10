@@ -44,22 +44,20 @@ class TwigExtension extends AbstractExtension
             $resolved = $this->resolveReference($ref, $class);
             if ($resolved instanceof ClassReflection) {
                 $path = $ext->pathForClass($context, $resolved);
+                $namespace = $resolved->getNamespace();
+                $title = $namespace === $class->getNamespace()
+                    ? $resolved->getName()
+                    : $resolved->getShortName()
+                ;
             } elseif ($resolved instanceof MethodReflection) {
                 $path = $ext->pathForMethod($context, $resolved);
+                $title = $resolved->getClass()->getNamespace();
             } elseif (is_string($resolved)) {
                 $path = $resolved;
                 $title = $title ?: $ref;
             } else {
                 // strip out inline tag and just display title, if given, or reference
                 return $title ?: $ref;
-            }
-
-            if (!$title) {
-                if ($resolved->getNamespace() === $class->getNamespace()) {
-                    $title = $resolved->getShortName();
-                } else {
-                    $title = $resolved->getName();
-                }
             }
 
             return sprintf('<a href="%s">%s</a>', $path, $title);
