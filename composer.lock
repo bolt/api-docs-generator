@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f299d83096837966d15bbf809d494c4a",
+    "content-hash": "b626b866de27c6a4d7bdd4cdf762c35a",
     "packages": [
         {
             "name": "blackfire/php-sdk",
@@ -67,12 +67,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/bolt/collection.git",
-                "reference": "0146f9269c29bc5dd5d10fc0b2798df4173fad44"
+                "reference": "a4ccf29e36d872cec8380eded1886c3f201700cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bolt/collection/zipball/0146f9269c29bc5dd5d10fc0b2798df4173fad44",
-                "reference": "0146f9269c29bc5dd5d10fc0b2798df4173fad44",
+                "url": "https://api.github.com/repos/bolt/collection/zipball/a4ccf29e36d872cec8380eded1886c3f201700cf",
+                "reference": "a4ccf29e36d872cec8380eded1886c3f201700cf",
                 "shasum": ""
             },
             "require": {
@@ -110,7 +110,7 @@
                 }
             ],
             "description": "Object Orientated implementations of various collections",
-            "time": "2017-08-08 04:21:28"
+            "time": "2017-08-10T04:34:17+00:00"
         },
         {
             "name": "bolt/common",
@@ -166,26 +166,26 @@
         },
         {
             "name": "bolt/filesystem",
-            "version": "2.3.1",
+            "version": "v2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bolt/filesystem.git",
-                "reference": "b60c5045c3944c3c8f6e3bee89dde2da1a6c282b"
+                "reference": "fe6b5bbd0a3209a077a9e709ed04477fba080179"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bolt/filesystem/zipball/b60c5045c3944c3c8f6e3bee89dde2da1a6c282b",
-                "reference": "b60c5045c3944c3c8f6e3bee89dde2da1a6c282b",
+                "url": "https://api.github.com/repos/bolt/filesystem/zipball/fe6b5bbd0a3209a077a9e709ed04477fba080179",
+                "reference": "fe6b5bbd0a3209a077a9e709ed04477fba080179",
                 "shasum": ""
             },
             "require": {
+                "bolt/common": "^1.0",
                 "ext-json": "*",
                 "guzzlehttp/psr7": "^1.2",
                 "league/flysystem": "^1.0",
-                "miljar/php-exif": "^0.5",
+                "miljar/php-exif": "^0.6",
                 "nesbot/carbon": "^1.20",
                 "php": "^5.5.9 || ^7.0",
-                "seld/jsonlint": "^1.4",
                 "symfony/finder": "^2.7|^3.0",
                 "symfony/yaml": "^2.7|^3.0",
                 "webmozart/glob": "^4.0"
@@ -196,6 +196,7 @@
                 "league/flysystem-aws-s3-v3": "^1.0",
                 "league/flysystem-cached-adapter": "^1.0",
                 "league/flysystem-memory": "^1.0",
+                "league/flysystem-sftp": "^1.0",
                 "phpunit/phpunit": "^4.8",
                 "psr/simple-cache": "^1.0",
                 "symfony/filesystem": "^2.7|^3.0"
@@ -229,7 +230,7 @@
                 }
             ],
             "description": "Bolt's filesystem abstraction layer",
-            "time": "2017-07-14T07:05:31+00:00"
+            "time": "2017-08-10T06:01:28+00:00"
         },
         {
             "name": "composer/ca-bundle",
@@ -491,16 +492,16 @@
         },
         {
             "name": "miljar/php-exif",
-            "version": "v0.5.1",
+            "version": "v0.6.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPExif/php-exif.git",
-                "reference": "fd4d4747e9ea5eeb91502fd40febb24f31f1e323"
+                "reference": "e43cc30608824d7f3466653b52bbbb71874b5b02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPExif/php-exif/zipball/fd4d4747e9ea5eeb91502fd40febb24f31f1e323",
-                "reference": "fd4d4747e9ea5eeb91502fd40febb24f31f1e323",
+                "url": "https://api.github.com/repos/PHPExif/php-exif/zipball/e43cc30608824d7f3466653b52bbbb71874b5b02",
+                "reference": "e43cc30608824d7f3466653b52bbbb71874b5b02",
                 "shasum": ""
             },
             "require": {
@@ -514,6 +515,7 @@
                 "squizlabs/php_codesniffer": "1.4.*@stable"
             },
             "suggest": {
+                "ext-exif": "Use exif PHP extension as adapter",
                 "lib-exiftool": "Use perl lib exiftool as adapter"
             },
             "type": "library",
@@ -541,7 +543,7 @@
                 "jpeg",
                 "tiff"
             ],
-            "time": "2015-08-26T14:01:00+00:00"
+            "time": "2017-02-06T14:40:26+00:00"
         },
         {
             "name": "nesbot/carbon",
@@ -1904,7 +1906,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^5.6 || ^7.0"
+        "php": "^7.1"
     },
     "platform-dev": []
 }
