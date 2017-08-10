@@ -4,11 +4,14 @@ namespace Bolt\Api;
 
 use Bolt\Api\Console\Command\Parse;
 use Bolt\Api\Console\Command\Render;
+use Bolt\Api\Filter\AndFilter;
+use Bolt\Api\Filter\NonInternalFilter;
 use Bolt\Collection\Bag;
 use Bolt\Filesystem\Adapter\Local;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Handler\YamlFile;
+use Sami\Parser\Filter\DefaultFilter;
 use Sami\Project as SamiProject;
 use Sami\RemoteRepository\GitHubRemoteRepository;
 use Sami\Sami;
@@ -116,6 +119,13 @@ final class Builder
 
             return $twig;
         });
+
+        $container['filter'] = function () {
+            return new AndFilter([
+                new DefaultFilter(),
+                new NonInternalFilter(),
+            ]);
+        };
 
         return $container;
     }
