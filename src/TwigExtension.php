@@ -77,7 +77,7 @@ class TwigExtension extends AbstractExtension
             return sprintf('<a href="%s">%s</a>', $path, $title);
         };
 
-        $desc = preg_replace_callback('/{@see ([^ ]+) ?(.*)}/', $resolveSee, $desc);
+        $desc = preg_replace_callback('/{@see ([^ }]+) ?([^}]*)}/', $resolveSee, $desc);
         $desc = preg_replace_callback('/@see ([^ ]+)/', $resolveSee, $desc);
 
         $html = $this->markdown->transform($desc);
