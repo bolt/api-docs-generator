@@ -168,6 +168,11 @@ class TwigExtension extends AbstractExtension
             return $class->getMethod($name);
         }
 
+        // parent method
+        if ($method = $class->getParentMethod($name)) {
+            return $method;
+        }
+
         // imported function
 
         // function in same ns
