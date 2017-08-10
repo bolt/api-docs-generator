@@ -44,14 +44,28 @@ class TwigExtension extends AbstractExtension
             $resolved = $this->resolveReference($ref, $class);
             if ($resolved instanceof ClassReflection) {
                 $path = $ext->pathForClass($context, $resolved);
-                $namespace = $resolved->getNamespace();
-                $title = $namespace === $class->getNamespace()
-                    ? $resolved->getName()
-                    : $resolved->getShortName()
-                ;
+
+                if (!$title) {
+                    $title = $resolved->getNamespace() === $class->getNamespace()
+                        ? $resolved->getShortName()
+                        : $resolved
+                    ;
+                }
             } elseif ($resolved instanceof MethodReflection) {
                 $path = $ext->pathForMethod($context, $resolved);
-                $title = $resolved->getClass()->getNamespace();
+
+                if (!$title) {
+                    if ($resolved->getClass()->getName() === $class->getName()) {
+                        // method
+                        $title = $resolved->getName();
+                    } elseif ($resolved->getClass()->getNamespace() === $class->getNamespace()) {
+                        // Bar::method
+                        $title = $resolved->getClass()->getShortName() . '::' . $resolved->getName();
+                    } else {
+                        // \Foo\Bar::method
+                        $title = $resolved;
+                    }
+                }
             } elseif (is_string($resolved)) {
                 $path = $resolved;
                 $title = $title ?: $ref;
