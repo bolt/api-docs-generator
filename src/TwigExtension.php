@@ -5,10 +5,26 @@ namespace Bolt\Api;
 use Michelf\MarkdownExtra;
 use Sami\Reflection\ClassReflection;
 use Sami\Reflection\MethodReflection;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
-class TwigExtension extends \Sami\Renderer\TwigExtension
+class TwigExtension extends AbstractExtension
 {
-    public function parseDesc(array $context, $desc, ClassReflection $class)
+    protected $markdown;
+
+    public function getFilters()
+    {
+        return [
+            new TwigFilter(
+                'desc',
+                [$this, 'parseDesc'],
+                ['needs_environment' => true, 'needs_context' => true, 'is_safe' => ['html']]
+            ),
+        ];
+    }
+
+    public function parseDesc(Environment $twig, array $context, $desc, ClassReflection $class)
     {
         if (!$desc) {
             return $desc;
@@ -18,15 +34,18 @@ class TwigExtension extends \Sami\Renderer\TwigExtension
             $this->markdown = new MarkdownExtra();
         }
 
-        $resolveSee = function ($match) use ($context, $class) {
+        /** @var \Sami\Renderer\TwigExtension $ext */
+        $ext = $twig->getExtension(\Sami\Renderer\TwigExtension::class);
+
+        $resolveSee = function ($match) use ($ext, $context, $class) {
             $ref = $match[1];
             $title = $match[2] ?? null;
 
             $resolved = $this->resolveReference($ref, $class);
             if ($resolved instanceof ClassReflection) {
-                $path = $this->pathForClass($context, $resolved);
+                $path = $ext->pathForClass($context, $resolved);
             } elseif ($resolved instanceof MethodReflection) {
-                $path = $this->pathForMethod($context, $resolved);
+                $path = $ext->pathForMethod($context, $resolved);
             } elseif (is_string($resolved)) {
                 $path = $resolved;
                 $title = $title ?: $ref;
