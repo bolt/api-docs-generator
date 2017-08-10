@@ -15,6 +15,7 @@ use Sami\Sami;
 use Sami\Version\GitVersionCollection;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Finder\Finder;
+use Twig\Environment;
 
 /**
  * API Generator Builder.
@@ -109,6 +110,12 @@ final class Builder
     {
         $container = new Sami($this->getIterator($project), $buildConfig);
         $container['template_dirs'] = $this->config->getThemePath();
+
+        $container->extend('twig', function (Environment $twig) {
+            $twig->addExtension(new TwigExtension());
+
+            return $twig;
+        });
 
         return $container;
     }
