@@ -51,6 +51,8 @@ class TwigExtension extends \Sami\Renderer\TwigExtension
 
         $html = $this->markdown->transform($desc);
 
+        $html = preg_replace('#<pre><code>#', '<pre><code class="language-php">', $html);
+
         return preg_replace(['#^<p>\s*#s', '#\s*</p>\s*$#s'], '', $html);
     }
 

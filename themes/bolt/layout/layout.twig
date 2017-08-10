@@ -1,1 +1,7 @@
 {% extends "default/layout/layout.twig" %}
+
+{% block head %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="{{ path('css/prism.css') }}">
+    <script src="{{ path('js/prism.js') }}"></script>
+{% endblock %}
