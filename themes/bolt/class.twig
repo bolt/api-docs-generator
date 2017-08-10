@@ -1,0 +1,18 @@
+{% extends "default/class.twig" %}
+
+{% macro deprecations(reflection) %}
+    {% from "macros.twig" import deprecated %}
+
+    {% if reflection.deprecated %}
+        <p>
+        {{ deprecated(reflection )}}
+        {% for tag in reflection.deprecated %}
+            <tr>
+                <td>{{ tag[0]|raw }}</td>
+                <td>{{ tag[1:]|join(' ')|desc(reflection.class) }}</td>
+            </tr>
+        {% endfor %}
+        </p>
+    {% endif %}
+{% endmacro %}
+{% from _self import deprecations %}
