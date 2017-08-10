@@ -1,0 +1,8 @@
+default_opened_level: 2
+
+paths:
+    build: %root%/var/build
+    cache: %root%/var/cache
+    theme: %root%/themes
+
+theme: bolt

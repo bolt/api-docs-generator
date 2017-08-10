@@ -1,0 +1,81 @@
+# The %root% value will be replaced with the project root path
+
+bolt/bolt:
+    path: '%root%/../repository/bolt'
+    includes:
+        - src
+    branches:
+        'master': '4.x development branch'
+        '3.x': '3.x development branch'
+        '3.4': '3.4 branch'
+        '3.3': '3.3 branch'
+        '3.2': '3.2 branch'
+        '3.1': '3.1 branch'
+        '3.0': '3.0 branch'
+        '2.2': '2.2 branch'
+    builds:
+        public: '[DRAFT] Bolt Public API'
+        internal: '[DRAFT] Internal Bolt API'
+
+bolt/collection:
+    path: '%root%/../repository/collection'
+    includes:
+        - src
+    branches:
+        'master': '1.1 development branch'
+        '1.0': '1.0 branch'
+    builds:
+        public: 'Bolt Collection Public API'
+        internal: 'Internal Bolt Collection API'
+
+bolt/common:
+    path: '%root%/../repository/common'
+    includes:
+        - src
+    branches:
+        'master': '1.1 development branch'
+        '1.0': '1.0 branch'
+    builds:
+        public: 'Bolt Common Public API'
+        internal: 'Internal Bolt Common API'
+
+bolt/filesystem:
+    path: '%root%/../repository/filesystem'
+    includes:
+        - src
+    branches:
+        'master': '2.4 development branch'
+        '2.3': '2.3 branch'
+        '2.2': '2.2 branch'
+        '2.1': '2.2 branch'
+        '2.0': '2.0 branch'
+    builds:
+        public: 'Bolt Filesystem Public API'
+        internal: 'Internal Bolt Filesystem API'
+
+bolt/session:
+    path: '%root%/../repository/session'
+    includes:
+        - src
+    branches:
+        'master': '1.0 development branch'
+#        '1.0': '1.0 branch'
+    builds:
+        public: 'Bolt Session Public API'
+        internal: 'Internal Bolt Session API'
+
+bolt/thumbs:
+    path: '%root%/../repository/thumbs'
+    includes:
+        - src
+    branches:
+        'master': '4.x development branch'
+        '3.x': '3.x development branch'
+        '3.3': '3.3 branch'
+        '3.2': '3.2 branch'
+        '3.1': '3.1 branch'
+        '3.0': '3.0 branch'
+        '2.x': '2.x branch'
+    builds:
+        public: 'Bolt Thumbs Public API'
+        internal: 'Internal Bolt Thumbs API'
