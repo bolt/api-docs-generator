@@ -91,13 +91,11 @@ final class Builder
             /** @var SamiProject $samiProject */
             $samiProject = $container['project'];
 
-            echo "Parsing $buildName $buildTitle\n";
+            echo "\nParsing '$buildName' build — $buildTitle\n";
             $samiProject->parse([$parse, 'messageCallback'], false);
-            $parse->echoOutput();
 
-            echo "Rendering $buildName $buildTitle\n";
+            echo "\nRendering '$buildName' build — $buildTitle\n";
             $samiProject->render([$render, 'messageCallback'], true);
-            $render->echoOutput();
         }
     }
 
